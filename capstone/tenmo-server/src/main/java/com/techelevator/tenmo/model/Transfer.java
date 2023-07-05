@@ -2,11 +2,20 @@ package com.techelevator.tenmo.model;
 
 public class Transfer {
 
+    private int transferId;
     private int transferTypeId;
     private int transferStatusId;
     private int accountFromId;
     private int accountToId;
     private double amount;
+
+    public int getTransferId() {
+        return transferId;
+    }
+
+    public void setTransferId(int transferId) {
+        this.transferId = transferId;
+    }
 
     public int getTransferTypeId() {
         return transferTypeId;
