@@ -60,6 +60,42 @@ public class JdbcTransferDao implements TransferDao {
         return transfer;
     }
 
+    @Override
+    public String getTransferStatusByTransferId(int transferId) {
+       String transferDesc = "";
+        String sql = "SELECT transfer_status_desc\n" +
+                "FROM transfer t\n" +
+                "JOIN transfer_status ts\n" +
+                "\tON t.transfer_status_id = ts.transfer_status_id WHERE transfer_id =?;";
+        try {
+           transferDesc = jdbcTemplate.queryForObject(sql, String.class,transferId);
+            if (transferDesc.equals("")) {
+                throw new DaoException("No status message found.");
+            }
+        } catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        }
+        return transferDesc;
+    }
+
+    @Override
+    public String getTransferTypeByTransferId(int transferId) {
+        String transferTypeDesc = "";
+        String sql = "SELECT transfer_type_desc\n" +
+                "FROM transfer t\n" +
+                "JOIN transfer_type tt\n" +
+                "\tON t.transfer_type_id = tt.transfer_type_id WHERE transfer_id =?;";
+        try {
+            transferTypeDesc = jdbcTemplate.queryForObject(sql, String.class,transferId);
+            if (transferTypeDesc.equals("")) {
+                throw new DaoException("No status message found.");
+            }
+        } catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        }
+        return transferTypeDesc;
+    }
+
     private Transfer mapRowToTransfer(SqlRowSet rs) {
         Transfer transfer = new Transfer();
         transfer.setTransferId(rs.getInt("transfer_id"));

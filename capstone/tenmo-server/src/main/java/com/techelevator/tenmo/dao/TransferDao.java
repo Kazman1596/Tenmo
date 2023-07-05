@@ -7,5 +7,7 @@ public interface TransferDao {
     Transfer getTransferByTransferId(int id);
     Transfer getAccountFromIdFromTransferId(int id);
     Transfer getAccountToIdFromTransferId(int id);
+    String getTransferStatusByTransferId(int id);
+    String getTransferTypeByTransferId(int id);
 
 }
