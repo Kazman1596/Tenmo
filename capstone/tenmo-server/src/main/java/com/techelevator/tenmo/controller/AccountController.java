@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping(path= "/account")
+@RequestMapping("/account")
 public class AccountController {
 
     private AccountDao accountDao;
@@ -21,6 +21,15 @@ public class AccountController {
         this.accountDao = accountDao;
     }
 
+    @RequestMapping(path = "/user/{id}", method = RequestMethod.GET)
+    public Account getFromUser(@PathVariable int id) {
+        Account account = accountDao.getAccountbyUserId(id);
+        if (account == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found.");
+        } else {
+            return account;
+        }
+    }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public Account get(@PathVariable int id) {
@@ -31,4 +40,5 @@ public class AccountController {
             return account;
         }
     }
+
 }

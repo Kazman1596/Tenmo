@@ -1,6 +1,9 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Transfer;
+import org.springframework.stereotype.Component;
+
+
 
 public interface TransferDao {
 
