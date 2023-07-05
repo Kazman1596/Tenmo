@@ -7,7 +7,9 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.stereotype.Component;
 
+@Component
 public class JdbcAccountDao implements AccountDao{
 
     private final JdbcTemplate jdbcTemplate;
@@ -19,7 +21,7 @@ public class JdbcAccountDao implements AccountDao{
     @Override
     public Account getAccountbyUserId(int userId) {
         Account account = null;
-        String sql = "SELECT * FROM account WHERE user_id =?;";
+        String sql = "SELECT account_id, user_id, balance FROM account WHERE user_id =?;";
         try {
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
             if (results.next()) {
@@ -34,7 +36,7 @@ public class JdbcAccountDao implements AccountDao{
     @Override
     public Account getAccountbyAccountId(int accountId) {
         Account account = null;
-        String sql = "SELECT * FROM account WHERE account_id =?;";
+        String sql = "SELECT account_id, user_id, balance FROM account WHERE account_id =?;";
         try {
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
             if (results.next()) {
