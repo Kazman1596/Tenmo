@@ -12,11 +12,6 @@ public interface TransferDao {
     Transfer updateTransfer(Transfer transfer);
     Transfer getTransferByTransferId(int id);
     List<Transfer> getTransfersByUserId(int userId);
-    /*
-    Transfer getAccountFromIdFromTransferId(int id);
-    Transfer getAccountToIdFromTransferId(int id);
-    String getTransferStatusByTransferId(int id);
-    String getTransferTypeByTransferId(int id);
-     */
+
 
 }

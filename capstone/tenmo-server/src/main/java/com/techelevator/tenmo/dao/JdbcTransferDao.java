@@ -45,8 +45,8 @@ public class JdbcTransferDao implements TransferDao {
         Transfer updatedTransfer = null;
                 String sql = "UPDATE transfer SET transfer_type_id = ?, transfer_status_id = ?, account_from = ?, account_to = ?, amount = ? WHERE transfer_id =?;";
     try {
-        int numberOfRows = jdbcTemplate.update(sql, updatedTransfer.getTransferTypeId(), updatedTransfer.getTransferStatusId(),
-                updatedTransfer.getAccountFromId(), updatedTransfer.getAccountToId(), updatedTransfer.getAmount(), updatedTransfer.getTransferId());
+        int numberOfRows = jdbcTemplate.update(sql, transfer.getTransferTypeId(), transfer.getTransferStatusId(),
+                transfer.getAccountFromId(), transfer.getAccountToId(), transfer.getAmount(), transfer.getTransferId());
     if (numberOfRows == 0) {
         throw new DaoException(("No rows affected, sorry."));
     } else {
@@ -78,10 +78,10 @@ public class JdbcTransferDao implements TransferDao {
     @Override
     public List<Transfer> getTransfersByUserId(int userId) {
         List<Transfer> transfersByUser= new ArrayList<>();
-        String sql="SELECT transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount FROM transfer WHERE user_id =?;";
+        String sql="SELECT transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount FROM transfer WHERE account_from = ? OR account_to = ?;";
         try{
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
-            if (results.next()) {
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId, userId);
+            while (results.next()) {
                 transfersByUser.add(mapRowToTransfer(results));
             }
         } catch (CannotGetJdbcConnectionException e) {

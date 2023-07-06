@@ -1,22 +1,18 @@
 package com.techelevator.tenmo.model;
 
 public class Transfer {
-
     private int transferId;
     private int transferTypeId;
     private int transferStatusId = 1;
-    private int accountFromId;
     private int accountToId;
+    private int accountFromId;
     private double amount;
 
-    //To use for mapRowToTransfer in JdbcTransferDao
-    public Transfer() {};
-
-    public Transfer(int amount, int accountToId, int accountFromId, int transferTypeId){
-        this.amount = amount;
+    public Transfer(int transferTypeId, int accountToId, int accountFromId, double amount) {
+        this.transferTypeId = transferTypeId;
         this.accountToId = accountToId;
         this.accountFromId = accountFromId;
-        this.transferTypeId = transferTypeId;
+        this.amount = amount;
     }
 
     public int getTransferId() {
@@ -43,20 +39,20 @@ public class Transfer {
         this.transferStatusId = transferStatusId;
     }
 
-    public int getAccountFromId() {
-        return accountFromId;
-    }
-
-    public void setAccountFromId(int accountFromId) {
-        this.accountFromId = accountFromId;
-    }
-
     public int getAccountToId() {
         return accountToId;
     }
 
     public void setAccountToId(int accountToId) {
         this.accountToId = accountToId;
+    }
+
+    public int getAccountFromId() {
+        return accountFromId;
+    }
+
+    public void setAccountFromId(int accountFromId) {
+        this.accountFromId = accountFromId;
     }
 
     public double getAmount() {
@@ -66,6 +62,5 @@ public class Transfer {
     public void setAmount(double amount) {
         this.amount = amount;
     }
-
 
 }

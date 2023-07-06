@@ -2,6 +2,7 @@ package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.TransferDao;
+import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,15 +11,22 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.annotation.HttpConstraint;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/transfer")
 public class TransferController {
 
+    @Autowired
     public TransferDao transferDao;
 
-    public TransferController(TransferDao transferDao) {
-        this.transferDao = transferDao;
+    @RequestMapping(path = "/user/{id}", method = RequestMethod.GET)
+    public List<Transfer> getTransfersByUserId(@PathVariable int id) {
+        List<Transfer> transfers = transferDao.getTransfersByUserId(id);
+        //TODO: Do we want to check if 0? Technically if a user was just created and doesn't have transfers, that's OK
+
+        return transfers;
     }
 
     @RequestMapping(path = "/{transferId}", method = RequestMethod.GET)
@@ -38,8 +46,13 @@ public class TransferController {
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
-    public Transfer update(@Valid @RequestBody Transfer transfer, @Valid @PathVariable int id) {
-        return transferDao.updateTransfer(transfer);
+    public Transfer update(@PathVariable int id, @Valid @RequestBody Transfer transfer ) {
+        try{
+            transfer.setTransferId(id);
+            return transferDao.updateTransfer(transfer);
+        } catch (DaoException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "We could not find the transfer");
+        }
     }
 
 }
