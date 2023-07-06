@@ -4,10 +4,18 @@ public class Transfer {
 
     private int transferId;
     private int transferTypeId;
-    private int transferStatusId;
+    private int transferStatusId = 1;
     private int accountFromId;
     private int accountToId;
     private double amount;
+
+
+    public Transfer(int amount, int accountToId, int accountFromId, int transferTypeId){
+        this.amount = amount;
+        this.accountToId = accountToId;
+        this.accountFromId = accountFromId;
+        this.transferTypeId = transferTypeId;
+    }
 
     public int getTransferId() {
         return transferId;
