@@ -2,10 +2,9 @@ package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.UserCredentials;
-import com.techelevator.tenmo.services.AccountService;
-import com.techelevator.tenmo.services.AuthenticationService;
-import com.techelevator.tenmo.services.ConsoleService;
+import com.techelevator.tenmo.services.*;
 
 public class App {
 
@@ -13,6 +12,8 @@ public class App {
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
     private final AccountService accountService = new AccountService();
+    private final TransferService transferService = new TransferService();
+    private final UserService userService = new UserService();
 
     private AuthenticatedUser currentUser;
 
@@ -70,7 +71,8 @@ public class App {
             if (menuSelection == 1) {
                 viewCurrentBalance(currentUser.getUser().getId());
             } else if (menuSelection == 2) {
-                viewTransferHistory();
+                //TODO: NOT HARDCODED
+                viewTransferHistory(2001);
             } else if (menuSelection == 3) {
                 viewPendingRequests();
             } else if (menuSelection == 4) {
@@ -92,8 +94,17 @@ public class App {
 
 	}
 
-	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
+	private void viewTransferHistory(int id) {
+        Transfer[] transfers = transferService.getTransfersByUserId(id);
+        System.out.println("--------------------------------------------");
+        System.out.println("Transfers");
+        System.out.println("ID           From/To           Amount");
+        System.out.println("--------------------------------------------");
+
+        //TODO: transfer.getAccountToId() should return username NOT id.
+        for (Transfer transfer : transfers) {
+            System.out.println(transfer.getAccountFromId() + "          " + transfer.getAccountToId() + "          " + transfer.getAmount());
+        }
 		
 	}
 

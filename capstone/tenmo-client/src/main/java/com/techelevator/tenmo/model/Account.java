@@ -7,6 +7,8 @@ public class Account {
     int accountId;
     Double balance;
 
+    //TODO: Instantiate userId in all Account parts both server and client
+
     public double getBalance() {
         return balance;
     }
