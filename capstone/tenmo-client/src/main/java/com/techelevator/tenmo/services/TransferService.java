@@ -6,4 +6,3 @@ public class TransferService {
 
 }
 
-//Send
