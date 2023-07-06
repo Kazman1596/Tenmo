@@ -8,6 +8,7 @@ public class Transfer {
     private int accountFromId;
     private double amount;
 
+    public Transfer() {};
     public Transfer(int transferTypeId, int accountToId, int accountFromId, double amount) {
         this.transferTypeId = transferTypeId;
         this.accountToId = accountToId;

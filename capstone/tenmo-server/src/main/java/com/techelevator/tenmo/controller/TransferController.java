@@ -24,8 +24,9 @@ public class TransferController {
     @RequestMapping(path = "/user/{id}", method = RequestMethod.GET)
     public List<Transfer> getTransfersByUserId(@PathVariable int id) {
         List<Transfer> transfers = transferDao.getTransfersByUserId(id);
-        //TODO: Do we want to check if 0? Technically if a user was just created and doesn't have transfers, that's OK
-
+        if (transfers.size() == 0) {
+            System.out.println("No transfers yet!");
+        }
         return transfers;
     }
 
