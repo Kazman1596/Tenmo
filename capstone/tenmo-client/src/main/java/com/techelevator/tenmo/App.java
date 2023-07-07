@@ -14,7 +14,6 @@ public class App {
     private final AccountService accountService = new AccountService();
     private final TransferService transferService = new TransferService();
     private final UserService userService = new UserService();
-
     private AuthenticatedUser currentUser;
 
     public static void main(String[] args) {
@@ -69,10 +68,10 @@ public class App {
             consoleService.printMainMenu();
             menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
             if (menuSelection == 1) {
-                viewCurrentBalance(currentUser.getUser().getId());
+                viewCurrentBalance();
             } else if (menuSelection == 2) {
                 //TODO: NOT HARDCODED
-                viewTransferHistory(2001);
+                viewTransferHistory();
             } else if (menuSelection == 3) {
                 viewPendingRequests();
             } else if (menuSelection == 4) {
@@ -88,14 +87,16 @@ public class App {
         }
     }
 
-	private void viewCurrentBalance(int id) {
-        Account currentAccount = accountService.getAccountFromUserId(id);
+	private void viewCurrentBalance() {
+        int userId = currentUser.getUser().getId();
+        Account currentAccount = accountService.getAccountFromUserId(userId);
         System.out.println(currentAccount.getBalance());
 
 	}
 
-	private void viewTransferHistory(int id) {
-        Transfer[] transfers = transferService.getTransfersByUserId(id);
+	private void viewTransferHistory() {
+        Account userAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
+        Transfer[] transfers = transferService.getTransfersByAccountId(userAccount.getAccountId());
         System.out.println("--------------------------------------------");
         System.out.println("Transfers");
         System.out.println("ID           From/To           Amount");
@@ -103,47 +104,74 @@ public class App {
 
         //TODO: transfer.getAccountToId() should return username NOT id.
         for (Transfer transfer : transfers) {
-            Account accountFrom = accountService.getAccount(transfer.getAccountFromId());
-            Account accountTo = accountService.getAccount(transfer.getAccountToId());
-            User userFrom = userService.getUserById(accountFrom.getUserId());
-            User userTo = userService.getUserById(accountTo.getUserId());
-            System.out.println(userFrom.getUsername() + "          " + userTo.getUsername() + "          " + transfer.getAmount());
+            getStringForTransfer(transfer);
         }
 		
 	}
 
 	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
+        Account userAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
+        Transfer[] userTransfers = transferService.getTransfersByAccountId(userAccount.getAccountId());
+        System.out.println("--------------------------------------------");
+        System.out.println("Transfers");
+        System.out.println("ID           From/To           Amount");
+        System.out.println("--------------------------------------------");
+
+        for (Transfer transfer : userTransfers) {
+            if (transfer.getTransferStatusId() == 1) {
+                getStringForTransfer(transfer);
+            }
+        }
 		
 	}
 
 	private void sendBucks() {
-		User user = consoleService.chooseFromList(getAllUsers());
-        System.out.println(user.getUsername());
-        BigDecimal amount = consoleService.promptForBigDecimal("Please type an amount to send.");
+		User userTo = consoleService.chooseUserFromList(getAllUsers());
+        int userToId = userTo.getId();
 
-        Transfer transfer = new Transfer(2, accountService.getAccountFromUserId(user.getId()).getAccountId(),
-                accountService.getAccountFromUserId(currentUser.getUser().getId()).getAccountId(), amount.doubleValue());
+        BigDecimal amount = consoleService.promptForBigDecimal("Please type an amount to send to " + userTo.getUsername() + ": ");
 
-        try {
-            transferService.
+        int userFromId = currentUser.getUser().getId();
+        Account accountFrom = accountService.getAccountFromUserId(userFromId);
+        Account accountTo = accountService.getAccountFromUserId(userToId);
 
-        }
+        Transfer transfer = new Transfer(2, accountTo.getAccountId(),
+                accountFrom.getAccountId(), amount.doubleValue());
 
+        transferService.createTransfer(transfer);
+        System.out.println("Successfully sent TEBucks!");
 
 	}
 
 	private void requestBucks() {
+        User userTo = consoleService.chooseUserFromList(getAllUsers());
+        int userToId = userTo.getId();
 
-        User userToRequest = consoleService.chooseFromList(getAllUsers());
-        System.out.println(userToRequest.getUsername());
-        BigDecimal amount = consoleService.promptForBigDecimal("Please type an amount to request.");
+        BigDecimal amount = consoleService.promptForBigDecimal("Please type an amount to send to " + userTo.getUsername() + ": ");
 
-        Transfer transfer = new Transfer();
+        int userFromId = currentUser.getUser().getId();
+        Account accountFrom = accountService.getAccountFromUserId(userFromId);
+        Account accountTo = accountService.getAccountFromUserId(userToId);
+
+        Transfer transfer = new Transfer(1, accountTo.getAccountId(),
+                accountFrom.getAccountId(), amount.doubleValue());
+
+        transferService.createTransfer(transfer);
+        System.out.println("Successfully requested TEBucks!");
 	}
 
     private User[] getAllUsers() {
         return userService.getUsers();
+    }
+
+    private void getStringForTransfer(Transfer transfer) {
+
+        Account accountFrom = accountService.getAccount(transfer.getAccountFromId());
+        Account accountTo = accountService.getAccount(transfer.getAccountToId());
+        User userFrom = userService.getUserById(accountFrom.getUserId());
+        User userTo = userService.getUserById(accountTo.getUserId());
+        System.out.println(userFrom.getUsername() + "          " + userTo.getUsername() + "          " + transfer.getAmount());
+
     }
 
 }

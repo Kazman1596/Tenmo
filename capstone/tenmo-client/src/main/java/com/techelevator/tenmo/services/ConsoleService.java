@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 
@@ -47,7 +48,7 @@ public class ConsoleService {
         System.out.println();
     }
 
-    public User chooseFromList(User[] users) {
+    public User chooseUserFromList(User[] users) {
         for (int i = 0; i < users.length; i++) {
             System.out.println(i + ": " + users[i].getUsername());
         }
@@ -55,6 +56,20 @@ public class ConsoleService {
             int selection = promptForInt("Please choose a number.");
             if (selection > 0 && selection < users.length) {
                 return users[selection];
+            } else {
+                System.out.println("Invalid choice.");
+            }
+        }
+    }
+
+    public Transfer chooseTransferFromList(Transfer[] pendingTransfers) {
+        for (int i = 0; i < pendingTransfers.length; i++) {
+            System.out.println(i + ": " + pendingTransfers[i].getAmount());
+        }
+        while (true) {
+            int selection = promptForInt("Please choose a number.");
+            if (selection > 0 && selection < pendingTransfers.length) {
+                return pendingTransfers[selection];
             } else {
                 System.out.println("Invalid choice.");
             }

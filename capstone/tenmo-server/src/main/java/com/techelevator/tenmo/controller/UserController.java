@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @RequestMapping(path = "/id/{id}", method = RequestMethod.GET)
-    public User getUserByName(@PathVariable int id) {
+    public User getUserById(@PathVariable int id) {
         User user = userDao.getUserById(id);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No such user.");
