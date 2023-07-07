@@ -3,6 +3,9 @@ package com.techelevator.tenmo;
 import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.*;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 public class App {
 
     private static final String API_BASE_URL = "http://localhost:8080/";
@@ -115,13 +118,32 @@ public class App {
 	}
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
-		
+		User user = consoleService.chooseFromList(getAllUsers());
+        System.out.println(user.getUsername());
+        BigDecimal amount = consoleService.promptForBigDecimal("Please type an amount to send.");
+
+        Transfer transfer = new Transfer(2, accountService.getAccountFromUserId(user.getId()).getAccountId(),
+                accountService.getAccountFromUserId(currentUser.getUser().getId()).getAccountId(), amount.doubleValue());
+
+        try {
+            transferService.
+
+        }
+
+
 	}
 
 	private void requestBucks() {
-		// TODO Auto-generated method stub
-		
+
+        User userToRequest = consoleService.chooseFromList(getAllUsers());
+        System.out.println(userToRequest.getUsername());
+        BigDecimal amount = consoleService.promptForBigDecimal("Please type an amount to request.");
+
+        Transfer transfer = new Transfer();
 	}
+
+    private User[] getAllUsers() {
+        return userService.getUsers();
+    }
 
 }

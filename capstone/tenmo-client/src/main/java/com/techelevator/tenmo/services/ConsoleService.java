@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 
 import java.math.BigDecimal;
@@ -46,46 +47,60 @@ public class ConsoleService {
         System.out.println();
     }
 
-    public UserCredentials promptForCredentials() {
-        String username = promptForString("Username: ");
-        String password = promptForString("Password: ");
-        return new UserCredentials(username, password);
-    }
-
-    public String promptForString(String prompt) {
-        System.out.print(prompt);
-        return scanner.nextLine();
-    }
-
-    public int promptForInt(String prompt) {
-        System.out.print(prompt);
+    public User chooseFromList(User[] users) {
+        for (int i = 0; i < users.length; i++) {
+            System.out.println(i + ": " + users[i].getUsername());
+        }
         while (true) {
-            try {
-                return Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter a number.");
+            int selection = promptForInt("Please choose a number.");
+            if (selection > 0 && selection < users.length) {
+                return users[selection];
+            } else {
+                System.out.println("Invalid choice.");
             }
         }
     }
 
-    public BigDecimal promptForBigDecimal(String prompt) {
-        System.out.print(prompt);
-        while (true) {
-            try {
-                return new BigDecimal(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter a decimal number.");
+
+        public UserCredentials promptForCredentials () {
+            String username = promptForString("Username: ");
+            String password = promptForString("Password: ");
+            return new UserCredentials(username, password);
+        }
+
+        public String promptForString (String prompt){
+            System.out.print(prompt);
+            return scanner.nextLine();
+        }
+
+        public int promptForInt (String prompt){
+            System.out.print(prompt);
+            while (true) {
+                try {
+                    return Integer.parseInt(scanner.nextLine());
+                } catch (NumberFormatException e) {
+                    System.out.println("Please enter a number.");
+                }
             }
         }
-    }
 
-    public void pause() {
-        System.out.println("\nPress Enter to continue...");
-        scanner.nextLine();
-    }
+        public BigDecimal promptForBigDecimal (String prompt){
+            System.out.print(prompt);
+            while (true) {
+                try {
+                    return new BigDecimal(scanner.nextLine());
+                } catch (NumberFormatException e) {
+                    System.out.println("Please enter a decimal number.");
+                }
+            }
+        }
 
-    public void printErrorMessage() {
-        System.out.println("An error occurred. Check the log for details.");
-    }
+        public void pause () {
+            System.out.println("\nPress Enter to continue...");
+            scanner.nextLine();
+        }
 
-}
+        public void printErrorMessage () {
+            System.out.println("An error occurred. Check the log for details.");
+        }
+    }
