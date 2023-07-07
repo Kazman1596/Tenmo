@@ -22,8 +22,8 @@ public class TransferController {
     public TransferDao transferDao;
 
     @RequestMapping(path = "/user/{id}", method = RequestMethod.GET)
-    public List<Transfer> getTransfersByUserId(@PathVariable int id) {
-        List<Transfer> transfers = transferDao.getTransfersByUserId(id);
+    public List<Transfer> getTransfersByAccountId(@PathVariable int id) {
+        List<Transfer> transfers = transferDao.getTransfersByAccountId(id);
         if (transfers.size() == 0) {
             System.out.println("No transfers yet!");
         }

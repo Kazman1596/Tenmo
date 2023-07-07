@@ -64,4 +64,29 @@ public class Transfer {
         this.amount = amount;
     }
 
+    public String getTypeString() {
+        String type = "";
+        if (transferTypeId == 1){
+            type = "Request";
+        }
+        if (transferTypeId == 2){
+            type = "Send";
+        }
+        return type;
+    }
+
+    public String getStatusString() {
+        String status = "";
+        if (transferStatusId == 1) {
+            status = "Pending";
+        }
+        if (transferStatusId == 2) {
+            status = "Approved";
+        }
+        if (transferStatusId == 3) {
+            status = "Rejected";
+        }
+        return status;
+    }
+
 }

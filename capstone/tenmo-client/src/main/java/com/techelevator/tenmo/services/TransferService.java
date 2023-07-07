@@ -18,6 +18,18 @@ public class TransferService {
     public static String API_BASE_URL = "http://localhost:8080/transfer/";
     private final RestTemplate restTemplate = new RestTemplate();
 
+    public Transfer getTransferByTransferId(int id) {
+        Transfer transfer = null;
+        try {
+            transfer = restTemplate.getForObject(API_BASE_URL + id, Transfer.class);
+        } catch (RestClientResponseException e) {
+            BasicLogger.log(e.getMessage());
+        } catch (ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+
+        return transfer;
+    }
     public Transfer[] getTransfersByAccountId(int id) {
         Transfer[] transferList = null;
 
@@ -76,9 +88,6 @@ public class TransferService {
 
         return success;
     }
-
-    //TODO: create method
-    //Todo: update method
 
 
 

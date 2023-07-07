@@ -11,7 +11,7 @@ public interface TransferDao {
     Transfer createTransfer(Transfer transfer);
     Transfer updateTransfer(Transfer transfer);
     Transfer getTransferByTransferId(int id);
-    List<Transfer> getTransfersByUserId(int userId);
+    List<Transfer> getTransfersByAccountId(int userId);
 
 
 }

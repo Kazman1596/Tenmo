@@ -48,34 +48,12 @@ public class ConsoleService {
         System.out.println();
     }
 
-    public User chooseUserFromList(User[] users) {
-        for (int i = 0; i < users.length; i++) {
-            System.out.println(i + ": " + users[i].getUsername());
+    public int chooseUserFromList(User[] users) {
+        for (User user : users) {
+            System.out.println(user.getId() + "       " + user.getUsername());
         }
-        while (true) {
-            int selection = promptForInt("Please choose a number.");
-            if (selection > 0 && selection < users.length) {
-                return users[selection];
-            } else {
-                System.out.println("Invalid choice.");
-            }
-        }
+       return promptForInt("Please choose a user id -->");
     }
-
-    public Transfer chooseTransferFromList(Transfer[] pendingTransfers) {
-        for (int i = 0; i < pendingTransfers.length; i++) {
-            System.out.println(i + ": " + pendingTransfers[i].getAmount());
-        }
-        while (true) {
-            int selection = promptForInt("Please choose a number.");
-            if (selection > 0 && selection < pendingTransfers.length) {
-                return pendingTransfers[selection];
-            } else {
-                System.out.println("Invalid choice.");
-            }
-        }
-    }
-
 
         public UserCredentials promptForCredentials () {
             String username = promptForString("Username: ");
@@ -117,5 +95,11 @@ public class ConsoleService {
 
         public void printErrorMessage () {
             System.out.println("An error occurred. Check the log for details.");
+        }
+
+        public void promptForApproval() {
+            System.out.println("1: Approve");
+            System.out.println("2: Reject");
+            System.out.println("0: Don't approve or reject");
         }
     }

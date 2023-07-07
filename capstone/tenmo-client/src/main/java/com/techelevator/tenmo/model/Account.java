@@ -8,8 +8,6 @@ public class Account {
     Double balance;
     int userId;
 
-    //TODO: Instantiate userId in all Account parts both server and client
-
     public double getBalance() {
         return balance;
     }
