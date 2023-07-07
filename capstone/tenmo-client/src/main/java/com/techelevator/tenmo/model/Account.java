@@ -6,6 +6,7 @@ public class Account {
 
     int accountId;
     Double balance;
+    int userId;
 
     //TODO: Instantiate userId in all Account parts both server and client
 
@@ -19,6 +20,10 @@ public class Account {
 
     public int getAccountId() {
         return accountId;
+    }
+
+    public int getUserId() {
+        return userId;
     }
 
 }
