@@ -1,9 +1,6 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.*;
 
 public class App {
@@ -103,7 +100,11 @@ public class App {
 
         //TODO: transfer.getAccountToId() should return username NOT id.
         for (Transfer transfer : transfers) {
-            System.out.println(transfer.getAccountFromId() + "          " + transfer.getAccountToId() + "          " + transfer.getAmount());
+            Account accountFrom = accountService.getAccount(transfer.getAccountFromId());
+            Account accountTo = accountService.getAccount(transfer.getAccountToId());
+            User userFrom = userService.getUserById(accountFrom.getUserId());
+            User userTo = userService.getUserById(accountTo.getUserId());
+            System.out.println(userFrom.getUsername() + "          " + userTo.getUsername() + "          " + transfer.getAmount());
         }
 		
 	}
