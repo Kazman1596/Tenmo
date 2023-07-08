@@ -45,11 +45,17 @@ public class TransferService {
     }
 
     public Transfer[] getPendingTransfers(int id, int transferStatusId) {
+        Transfer[] pendingTransfers = null;
 
-        String url =API_BASE_URL + id + "?pending=" + transferStatusId;
-        Transfer[] results = restTemplate.getForObject(url, Transfer[].class);
-
-        return results;
+        try {
+            String url = API_BASE_URL + "user/" + id + "?transferStatusId=" + transferStatusId;
+            pendingTransfers = restTemplate.getForObject(url, Transfer[].class);
+        } catch (RestClientResponseException e) {
+            BasicLogger.log(e.getMessage());
+        } catch (ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return pendingTransfers;
     }
 
     public Transfer createTransfer(Transfer newTransfer) {

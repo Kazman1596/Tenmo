@@ -95,11 +95,11 @@ public class App {
         while (menuSelection != 0) {
             consoleService.printMainMenu();
             menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
-            if (menuSelection == 1) {
+            if (menuSelection == 1) { //Approve
 
-            } else if (menuSelection == 2) {
+            } else if (menuSelection == 2) { //Reject
 
-            } else if (menuSelection == 3) {
+            } else if (menuSelection == 3) { //Do Nothing
 
             }
         }
@@ -123,20 +123,10 @@ public class App {
 
 	private void viewPendingRequests() {
         Account userAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
-        Transfer[] userTransfers = transferService.getTransfersByAccountId(userAccount.getAccountId());
-
-//        Transfer[] pendingTransfers = new Transfer[];
-
+        Transfer[] pendingTransfers = transferService.getPendingTransfers(userAccount.getAccountId(), 1);
         createTransferBanner();
-
-//        for (Transfer transfer : userTransfers) {
-//            if (transfer.getTransferStatusId() == 1) {
-//                pendingTransfers.add(transfer);
-//            }
-//        }
-//
-//        Transfer transfer = chooseTransferFromList(pendingTransfers.toArray());
-//        getTransferDetails(transfer);
+        Transfer transfer = chooseTransferFromList(pendingTransfers);
+        getTransferDetails(transfer);
 
 	}
 
@@ -271,5 +261,29 @@ public class App {
         //transfer.setTransferStatusId();
     }
 
+    private void updateTransfer(Transfer transfer, boolean isApproved) {
+        //TODO: If I approve a request for money and have sufficient funds, then update transfer status ID and subtract from my account balance
+        // Approvals are always initiated by the accountFrom (user who is Sending the money)
+        // Send Money needs to be updated
+        Account accountFrom = accountService.getAccount(transfer.getAccountFromId());
+        Account accountTo = accountService.getAccount(transfer.getAccountToId()); //Needed in order to increment their balance
+        Account currentAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
 
+        if (accountTo.getAccountId() == currentAccount.getAccountId() && currentAccount.getBalance() > transfer.getAmount() && isApproved) {
+
+            // update transfer status
+            transfer.setTransferStatusId(2);
+            transferService.updateTransfer(transfer);
+
+            //decrement our account
+            accountTo.setBalance(accountTo.getBalance() - transfer.getAmount());
+            accountService.getAccount(updateAccount(accountTo));
+
+            //increase their account
+            accountFrom.setBalance(accountFrom.getBalance() + transfer.getAmount());
+            accountService.getAccount(updateAccount(accountFrom));
+
+        }
+
+    }
 }
