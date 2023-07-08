@@ -22,11 +22,16 @@ public class TransferController {
     public TransferDao transferDao;
 
     @RequestMapping(path = "/user/{id}", method = RequestMethod.GET)
-    public List<Transfer> getTransfersByAccountId(@PathVariable int id) {
-        List<Transfer> transfers = transferDao.getTransfersByAccountId(id);
+    public List<Transfer> getTransfersByAccountId(@PathVariable int id, @RequestParam(defaultValue = "0") int transferStatusId) {
+        List<Transfer> transfers = transferDao.getTransfersByAccountId(id, transferStatusId);
         if (transfers.size() == 0) {
             System.out.println("No transfers yet!");
         }
+
+        if (transferStatusId > 0) {
+            return transferDao.getTransfersByAccountId(id, transferStatusId);
+        }
+
         return transfers;
     }
 

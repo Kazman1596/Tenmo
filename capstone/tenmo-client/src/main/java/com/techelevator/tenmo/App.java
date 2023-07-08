@@ -5,6 +5,7 @@ import com.techelevator.tenmo.services.*;
 
 import java.io.FilterOutputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 public class App {
@@ -123,23 +124,32 @@ public class App {
 	private void viewPendingRequests() {
         Account userAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
         Transfer[] userTransfers = transferService.getTransfersByAccountId(userAccount.getAccountId());
+
+        Transfer[] pendingTransfers = new Transfer[];
+
         createTransferBanner();
 
         for (Transfer transfer : userTransfers) {
             if (transfer.getTransferStatusId() == 1) {
-                getStringForTransfer(transfer);
+                pendingTransfers.add(transfer);
             }
         }
-		
+
+        Transfer transfer = chooseTransferFromList(pendingTransfers.toArray());
+        getTransferDetails(transfer);
+
 	}
 
 	private void sendBucks() {
-        //TODO: Check to see if user has enough money to send
         createSendRequestTransferBanner();
 		Transfer transfer = transferPrompt(2);
-        transferService.createTransfer(transfer);
-        System.out.println();
-        System.out.println("Successfully sent TEBucks!");
+        if (transfer.getAmount() < accountService.getAccount(transfer.getAccountFromId()).getBalance()) {
+            transferService.createTransfer(transfer);
+            System.out.println();
+            System.out.println("Successfully sent TEBucks!");
+        } else {
+            System.out.println("Amount exceeds available account balance.");
+        }
 
 	}
 

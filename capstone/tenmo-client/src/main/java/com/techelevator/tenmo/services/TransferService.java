@@ -30,7 +30,7 @@ public class TransferService {
 
         return transfer;
     }
-    public Transfer[] getTransfersByAccountId(int id) {
+    public Transfer[] getTransfersByAccountId(int id, boolean pending) {
         Transfer[] transferList = null;
 
         try{
@@ -42,6 +42,14 @@ public class TransferService {
         }
 
         return transferList;
+    }
+
+    public Transfer[] getPendingTransfers(int id, boolean pending) {
+
+        String url =API_BASE_URL + id + "?pending=" + pending;
+        Transfer[] results = restTemplate.getForObject(url, Transfer[].class);
+
+        return results;
     }
 
     public Transfer createTransfer(Transfer newTransfer) {
