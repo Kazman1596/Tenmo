@@ -90,21 +90,6 @@ public class App {
         }
     }
 
-    private void transferMenu() {
-        int menuSelection = -1;
-        while (menuSelection != 0) {
-            consoleService.printMainMenu();
-            menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
-            if (menuSelection == 1) { //Approve
-
-            } else if (menuSelection == 2) { //Reject
-
-            } else if (menuSelection == 3) { //Do Nothing
-
-            }
-        }
-    }
-
 	private void viewCurrentBalance() {
         int userId = currentUser.getUser().getId();
         Account currentAccount = accountService.getAccountFromUserId(userId);
@@ -127,8 +112,28 @@ public class App {
         createTransferBanner();
         Transfer transfer = chooseTransferFromList(pendingTransfers);
         getTransferDetails(transfer);
-
+        transferMenu(transfer);
 	}
+//TODO: add spacing between deets and menu
+    private void transferMenu(Transfer transfer) {
+        int menuSelection = -1;
+        while (menuSelection != 0) {
+            consoleService.promptForApproval();
+            menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
+            if (menuSelection == 1) { //Approve
+                updateTransfer(transfer, true);
+                break;
+
+            } else if (menuSelection == 2) { //Reject
+                updateTransfer(transfer, false);
+                break;
+
+            } else if (menuSelection == 0) { //Do Nothing
+                break;
+
+            }
+        }
+    }
 
 	private void sendBucks() {
         createSendRequestTransferBanner();
@@ -192,16 +197,22 @@ public class App {
     public Transfer chooseTransferFromList(Transfer[] transfers) {
         String toFrom = "";
         Account currentAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
+        Account otherAccount = null;
+
         while(true) {
             for (Transfer transfer : transfers) {
-                if (transfer.getAccountFromId() != currentAccount.getAccountId()) {
+
+                otherAccount = accountService.getAccount(transfer.getAccountFromId());
+
+                if (transfer.getAccountFromId() == currentAccount.getAccountId()) {
                     toFrom = "To:";
-                    //TODO: If you want
                 } else {
                     toFrom = "From:";
                 }
                 User user = userService.getUserById(currentAccount.getUserId());
-                System.out.println(transfer.getTransferId() + "    " + toFrom + " " + user.getUsername() + "     $" + transfer.getAmount());
+                User userFrom = userService.getUserById(otherAccount.getUserId());
+
+                System.out.println(transfer.getTransferId() + "    " + toFrom + " " + userFrom.getUsername() + "     $" + transfer.getAmount());
             }
             int transferIdRequested = consoleService.promptForInt("Please choose a Transfer ID -->");
             //TODO: If transfer doesn't exist, try/catch does nothing
@@ -269,22 +280,30 @@ public class App {
         Account accountTo = accountService.getAccount(transfer.getAccountToId()); //Needed in order to increment their balance
         Account currentAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
 
-        if (accountTo.getAccountId() == currentAccount.getAccountId() && currentAccount.getBalance() > transfer.getAmount() && isApproved) {
+        if (isApproved) {
+            //TODO: don't allow users to approve (or even see) their own pending requests.
+            if (currentAccount.getBalance() > transfer.getAmount()) {
 
-            // update transfer status
-            transfer.setTransferStatusId(2);
+                // update transfer status
+                transfer.setTransferStatusId(2);
+                transferService.updateTransfer(transfer);
+                System.out.println("Transfer approved.");
+
+                //decrement our account
+                accountTo.setBalance(accountTo.getBalance() - transfer.getAmount());
+                accountService.updateAccount(accountTo);
+                System.out.println("Your new account balance is " + accountTo.getBalance());
+
+                //increase their account
+                accountFrom.setBalance(accountFrom.getBalance() + transfer.getAmount());
+                accountService.updateAccount(accountFrom);
+            } else {
+                System.out.println("Insufficient funds.");
+            }
+        } else {
+            transfer.setTransferStatusId(3);
             transferService.updateTransfer(transfer);
-            System.out.println("Transfer approved.");
-
-            //decrement our account
-            accountTo.setBalance(accountTo.getBalance() - transfer.getAmount());
-            accountService.getAccount(updateAccount(accountTo));
-            System.out.println("Your new account balance is " + accountTo.getBalance());
-
-            //increase their account
-            accountFrom.setBalance(accountFrom.getBalance() + transfer.getAmount());
-            accountService.getAccount(updateAccount(accountFrom));
+            System.out.println("Transfer has been rejected.");
         }
-
     }
 }
