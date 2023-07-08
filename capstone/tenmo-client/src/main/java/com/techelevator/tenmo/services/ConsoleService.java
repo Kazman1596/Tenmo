@@ -98,8 +98,10 @@ public class ConsoleService {
         }
 
         public void promptForApproval() {
+            System.out.println();
             System.out.println("1: Approve");
             System.out.println("2: Reject");
             System.out.println("0: Don't approve or reject");
+            System.out.println();
         }
     }

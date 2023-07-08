@@ -11,6 +11,10 @@ import java.util.List;
 public class App {
 
     //TODO: Integration tests on Server side
+    //TODO: Clean this APP UP (WHY 579 lines??)
+    //TODO: Refactor Methods
+    //TODO: Test trying to send (or REQUEST) more money than you have
+    //TODO: Test sending (or requesting) 0 or negative amount
 
     private static final String API_BASE_URL = "http://localhost:8080/";
     private final ConsoleService consoleService = new ConsoleService();
@@ -114,7 +118,7 @@ public class App {
         getTransferDetails(transfer);
         transferMenu(transfer);
 	}
-//TODO: add spacing between deets and menu
+
     private void transferMenu(Transfer transfer) {
         int menuSelection = -1;
         while (menuSelection != 0) {
@@ -137,11 +141,28 @@ public class App {
 
 	private void sendBucks() {
         createSendRequestTransferBanner();
+
+        //Creating transfer
 		Transfer transfer = transferPrompt(2);
-        if (transfer.getAmount() < accountService.getAccount(transfer.getAccountFromId()).getBalance()) {
+        transfer.setTransferStatusId(2);
+
+        //Accounts involved
+        Account accountTo = accountService.getAccount(transfer.getAccountToId());
+        Account accountFrom = accountService.getAccount(transfer.getAccountFromId());
+
+        //Checking for balance and updating balances
+        if (transfer.getAmount() < accountFrom.getBalance()) {
+            //Setting new balances
+            accountTo.setBalance(accountTo.getBalance() + transfer.getAmount());
+            accountFrom.setBalance(accountFrom.getBalance() - transfer.getAmount());
+            //Updating database
             transferService.createTransfer(transfer);
+            accountService.updateAccount(accountTo);
+            accountService.updateAccount(accountFrom);
+
             System.out.println();
             System.out.println("Successfully sent TEBucks!");
+            System.out.println("Your new balance is $" + accountFrom.getBalance());
         } else {
             System.out.println("Amount exceeds available account balance.");
         }
@@ -170,18 +191,20 @@ public class App {
 
     }
 
-    //TODO: This is disgusting. Make prettier.
     private Transfer transferPrompt(int transferTypeId) {
         while(true) {
+            //Menu to choose
             int userIdRequested = consoleService.chooseUserFromList(getAllUsers());
             try{
+                //See if choice is valid
                 User userTo = userService.getUserById(userIdRequested);
                 int userToId = userTo.getId();
                 int userFromId = currentUser.getUser().getId();
                 if (userFromId == userToId) {
                     System.out.println("Cannot send/request money from yourself!");
                 } else {
-                    BigDecimal amount = consoleService.promptForBigDecimal("Please type an amount to request to " + userTo.getUsername() + ": ");
+                    //TODO: Reword
+                    BigDecimal amount = consoleService.promptForBigDecimal("Please type an amount to/from " + userTo.getUsername() + ": ");
                     Account accountFrom = accountService.getAccountFromUserId(userFromId);
                     Account accountTo = accountService.getAccountFromUserId(userToId);
 
@@ -189,7 +212,7 @@ public class App {
                             accountFrom.getAccountId(), amount.doubleValue());
                 }
             } catch (NullPointerException ex) {
-                System.out.println("The user was not found");
+                System.out.println("The user was not found!!!!!!");
             }
         }
     }
@@ -216,11 +239,10 @@ public class App {
                 System.out.println(transfer.getTransferId() + "    " + toFrom + " " + userFrom.getUsername() + "     $" + transfer.getAmount());
             }
             int transferIdRequested = consoleService.promptForInt("Please choose a Transfer ID -->");
-            //TODO: If transfer doesn't exist, try/catch does nothing
-            try{
-                Transfer transfer = transferService.getTransferByTransferId(transferIdRequested);
+            Transfer transfer = transferService.getTransferByTransferId(transferIdRequested);
+            if (transfer != null){
                 return transfer;
-            } catch (NullPointerException e) {
+            } else {
                 System.out.println("Transfer was not found");
             }
         }
@@ -265,26 +287,13 @@ public class App {
         System.out.println("Amount: $" + transfer.getAmount());
     }
 
-    private void approveRejectTransfer(Transfer transfer) {
-        //TODO: transfer has to update
-        //TODO: "Transfer approved/rejected"
-        //TODO: Update Balance (account.setBalance() && updateAccount()) to reflect approval based on to/from
-        //TODO: "Your new balance is..."
-        //transfer.setTransferStatusId();
-    }
-
     private void updateTransfer(Transfer transfer, boolean isApproved) {
-        //TODO: If I approve a request for money and have sufficient funds, then update transfer status ID and subtract from my account balance
-        // Approvals are always initiated by the accountFrom (user who is Sending the money)
-        // Send Money needs to be updated
         Account accountFrom = accountService.getAccount(transfer.getAccountFromId());
         Account accountTo = accountService.getAccount(transfer.getAccountToId()); //Needed in order to increment their balance
         Account currentAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
 
         if (isApproved) {
-            //TODO: don't allow users to approve (or even see) their own pending requests.
             if (currentAccount.getBalance() > transfer.getAmount()) {
-
                 // update transfer status
                 transfer.setTransferStatusId(2);
                 transferService.updateTransfer(transfer);
