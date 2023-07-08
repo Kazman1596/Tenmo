@@ -193,7 +193,8 @@ public class App {
             }
         }
     }
-
+//TODO: DOes transfer menu need to be 0, 1 2,
+    //TODO: APproved xfers showing up in view pendings still
     public Transfer chooseTransferFromList(Transfer[] transfers) {
         String toFrom = "";
         Account currentAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
