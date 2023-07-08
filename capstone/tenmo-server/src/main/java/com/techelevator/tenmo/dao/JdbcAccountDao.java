@@ -2,7 +2,9 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -46,6 +48,25 @@ public class JdbcAccountDao implements AccountDao{
             throw new DaoException("Unable to connect to server or database", e);
         }
         return account;
+    }
+
+    @Override
+    public Account updateAccount(Account account) {
+        Account updatedAccount = null;
+        String sql = "UPDATE account SET balance =? WHERE account_id =?;";
+        try {
+            int numberOfRows = jdbcTemplate.update(sql, account.getBalance(), account.getAccountId());
+            if (numberOfRows == 0) {
+                throw new DaoException(("No rows affected, sorry."));
+            } else {
+                updatedAccount = getAccountbyAccountId(account.getAccountId());
+            }
+        } catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database.", e);
+        } catch (DataIntegrityViolationException e) {
+            throw new DaoException("Data integrity violation", e);
+        }
+        return updatedAccount;
     }
 
 

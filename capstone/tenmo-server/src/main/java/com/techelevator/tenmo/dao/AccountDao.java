@@ -8,4 +8,6 @@ public interface AccountDao {
 
     Account getAccountbyAccountId(int accountId);
 
+    Account updateAccount(Account account);
+
 }
