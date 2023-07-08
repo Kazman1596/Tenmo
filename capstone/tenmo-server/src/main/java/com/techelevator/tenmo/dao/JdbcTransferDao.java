@@ -79,15 +79,17 @@ public class JdbcTransferDao implements TransferDao {
     public List<Transfer> getTransfersByAccountId(int userId, int transferStatusId) {
         List<Transfer> transfersByUser= new ArrayList<>();
         String sql="SELECT transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount FROM transfer WHERE account_from = ? OR account_to = ?";
+        SqlRowSet results;
 
         if(transferStatusId > 0) {
-            sql += "AND transfer_status_id =?;";
+            sql += " AND transfer_status_id =?;";
+            results = jdbcTemplate.queryForRowSet(sql, userId, userId, transferStatusId);
         } else {
             sql += ";";
+            results = jdbcTemplate.queryForRowSet(sql, userId, userId);
         }
 
         try{
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId, userId, transferStatusId);
             while (results.next()) {
                 transfersByUser.add(mapRowToTransfer(results));
             }
