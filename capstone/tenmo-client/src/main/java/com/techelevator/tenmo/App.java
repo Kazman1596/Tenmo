@@ -274,7 +274,7 @@ public class App {
             // update transfer status
             transfer.setTransferStatusId(2);
             transferService.updateTransfer(transfer);
-            System.out.println("Transfer approved.")
+            System.out.println("Transfer approved.");
 
             //decrement our account
             accountTo.setBalance(accountTo.getBalance() - transfer.getAmount());
