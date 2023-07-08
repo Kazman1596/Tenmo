@@ -125,18 +125,18 @@ public class App {
         Account userAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
         Transfer[] userTransfers = transferService.getTransfersByAccountId(userAccount.getAccountId());
 
-        Transfer[] pendingTransfers = new Transfer[];
+//        Transfer[] pendingTransfers = new Transfer[];
 
         createTransferBanner();
 
-        for (Transfer transfer : userTransfers) {
-            if (transfer.getTransferStatusId() == 1) {
-                pendingTransfers.add(transfer);
-            }
-        }
-
-        Transfer transfer = chooseTransferFromList(pendingTransfers.toArray());
-        getTransferDetails(transfer);
+//        for (Transfer transfer : userTransfers) {
+//            if (transfer.getTransferStatusId() == 1) {
+//                pendingTransfers.add(transfer);
+//            }
+//        }
+//
+//        Transfer transfer = chooseTransferFromList(pendingTransfers.toArray());
+//        getTransferDetails(transfer);
 
 	}
 
