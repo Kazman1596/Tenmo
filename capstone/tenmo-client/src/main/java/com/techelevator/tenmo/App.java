@@ -274,15 +274,16 @@ public class App {
             // update transfer status
             transfer.setTransferStatusId(2);
             transferService.updateTransfer(transfer);
+            System.out.println("Transfer approved.")
 
             //decrement our account
             accountTo.setBalance(accountTo.getBalance() - transfer.getAmount());
             accountService.getAccount(updateAccount(accountTo));
+            System.out.println("Your new account balance is " + accountTo.getBalance());
 
             //increase their account
             accountFrom.setBalance(accountFrom.getBalance() + transfer.getAmount());
             accountService.getAccount(updateAccount(accountFrom));
-
         }
 
     }
