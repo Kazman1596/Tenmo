@@ -85,7 +85,7 @@ public class TransferMenu {
                     Account accountTo = accountService.getAccountFromUserId(userToId);
 
                     return new Transfer(transferTypeId, accountTo.getAccountId(),
-                            accountFrom.getAccountId(), amount.doubleValue());
+                            accountFrom.getAccountId(), amount);
                 }
             } catch (NullPointerException ex) {
                 System.out.println("The user was not found");
@@ -97,19 +97,20 @@ public class TransferMenu {
         Account accountFrom = accountService.getAccount(transfer.getAccountFromId());
 
         if (isApproved) {
-            if (currentAccount.getBalance() > transfer.getAmount()) {
+            // if currentAccount.getBalance > transfer.getAmount
+            if (currentAccount.getBalance().compareTo(transfer.getAmount()) > 0) {
                 // update transfer status
                 transfer.setTransferStatusId(2);
                 transferService.updateTransfer(transfer);
                 System.out.println("Transfer approved.");
 
                 //decrement our account
-                currentAccount.setBalance(currentAccount.getBalance() - transfer.getAmount());
+                currentAccount.setBalance(currentAccount.getBalance().subtract(transfer.getAmount()));
                 accountService.updateAccount(currentAccount);
                 System.out.println("Your new account balance is " + currentAccount.getBalance());
 
                 //increase their account
-                accountFrom.setBalance(accountFrom.getBalance() + transfer.getAmount());
+                accountFrom.setBalance(accountFrom.getBalance().add(transfer.getAmount()));
                 accountService.updateAccount(accountFrom);
             } else {
                 System.out.println("Insufficient funds.");

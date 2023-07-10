@@ -126,10 +126,11 @@ public class App {
         Account accountTo = accountService.getAccount(transfer.getAccountToId());
 
         //Checking for balance and updating balances
-        if (transfer.getAmount() < currentAccount.getBalance()) {
+        //transfer.getAmount() < currentAccount.getBalance()
+        if (transfer.getAmount().compareTo(currentAccount.getBalance()) < 0) {
             //Setting new balances
-            accountTo.setBalance(accountTo.getBalance() + transfer.getAmount());
-            currentAccount.setBalance(currentAccount.getBalance() - transfer.getAmount());
+            accountTo.setBalance(accountTo.getBalance().add(transfer.getAmount()));
+            currentAccount.setBalance(currentAccount.getBalance().subtract(transfer.getAmount()));
             //Updating database
             transferService.createTransfer(transfer);
             accountService.updateAccount(accountTo);
