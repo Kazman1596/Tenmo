@@ -10,12 +10,6 @@ import java.util.List;
 
 public class App {
 
-    //TODO: Integration tests on Server side
-    //TODO: Clean this APP UP (WHY 579 lines??)
-    //TODO: Refactor Methods
-    //TODO: Test trying to send (or REQUEST) more money than you have
-    //TODO: Test sending (or requesting) 0 or negative amount
-
     private static final String API_BASE_URL = "http://localhost:8080/";
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
@@ -23,6 +17,8 @@ public class App {
     private final TransferService transferService = new TransferService();
     private final UserService userService = new UserService();
     private AuthenticatedUser currentUser;
+    private Account currentAccount;
+    private TransferMenu transferMenu;
 
     public static void main(String[] args) {
         App app = new App();
@@ -67,9 +63,11 @@ public class App {
         currentUser = authenticationService.login(credentials);
         if (currentUser == null) {
             consoleService.printErrorMessage();
+        } else {
+            currentAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
+            transferMenu = new TransferMenu(currentAccount);
         }
     }
-
     private void mainMenu() {
         int menuSelection = -1;
         while (menuSelection != 0) {
@@ -95,74 +93,52 @@ public class App {
     }
 
 	private void viewCurrentBalance() {
-        int userId = currentUser.getUser().getId();
-        Account currentAccount = accountService.getAccountFromUserId(userId);
         System.out.println("$ " + currentAccount.getBalance());
-
 	}
 
 	private void viewTransferHistory() {
-        Account userAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
-        Transfer[] transfers = transferService.getTransfersByAccountId(userAccount.getAccountId());
-        createTransferBanner();
-        Transfer transfer = chooseTransferFromList(transfers);
+        Transfer[] transfers = transferService.getTransfersByAccountId(currentAccount.getAccountId());
+        consoleService.createTransferBanner();
+        Transfer transfer = transferMenu.chooseTransferFromList(transfers);
         getTransferDetails(transfer);
-		
 	}
 
 	private void viewPendingRequests() {
-        Account userAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
-        Transfer[] pendingTransfers = transferService.getPendingTransfers(userAccount.getAccountId(), 1);
-        createTransferBanner();
-        Transfer transfer = chooseTransferFromList(pendingTransfers);
-        getTransferDetails(transfer);
-        transferMenu(transfer);
+        Transfer[] pendingTransfers = transferService.getPendingTransfers(currentAccount.getAccountId(), 1);
+        consoleService.createPendingTransferBanner();
+        if (pendingTransfers.length != 0) {
+            Transfer transfer = transferMenu.chooseTransferFromList(pendingTransfers);
+            getTransferDetails(transfer);
+            transferMenu.transferMenuPrompt(transfer);
+        } else {
+            System.out.println("Looks like you don't owe anyone money...");
+        }
 	}
 
-    private void transferMenu(Transfer transfer) {
-        int menuSelection = -1;
-        while (menuSelection != 0) {
-            consoleService.promptForApproval();
-            menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
-            if (menuSelection == 1) { //Approve
-                updateTransfer(transfer, true);
-                break;
-
-            } else if (menuSelection == 2) { //Reject
-                updateTransfer(transfer, false);
-                break;
-
-            } else if (menuSelection == 0) { //Do Nothing
-                break;
-
-            }
-        }
-    }
-
 	private void sendBucks() {
-        createSendRequestTransferBanner();
+        consoleService.createSendRequestTransferBanner();
 
         //Creating transfer
-		Transfer transfer = transferPrompt(2);
+		Transfer transfer = transferMenu.transferPrompt(2);
         transfer.setTransferStatusId(2);
 
-        //Accounts involved
+        //Account involved aside from currentUser
         Account accountTo = accountService.getAccount(transfer.getAccountToId());
-        Account accountFrom = accountService.getAccount(transfer.getAccountFromId());
 
         //Checking for balance and updating balances
-        if (transfer.getAmount() < accountFrom.getBalance()) {
+        //transfer.getAmount() < currentAccount.getBalance()
+        if (transfer.getAmount().compareTo(currentAccount.getBalance()) < 0) {
             //Setting new balances
-            accountTo.setBalance(accountTo.getBalance() + transfer.getAmount());
-            accountFrom.setBalance(accountFrom.getBalance() - transfer.getAmount());
+            accountTo.setBalance(accountTo.getBalance().add(transfer.getAmount()));
+            currentAccount.setBalance(currentAccount.getBalance().subtract(transfer.getAmount()));
             //Updating database
             transferService.createTransfer(transfer);
             accountService.updateAccount(accountTo);
-            accountService.updateAccount(accountFrom);
+            accountService.updateAccount(currentAccount);
 
             System.out.println();
             System.out.println("Successfully sent TEBucks!");
-            System.out.println("Your new balance is $" + accountFrom.getBalance());
+            System.out.println("Your new balance is $" + currentAccount.getBalance());
         } else {
             System.out.println("Amount exceeds available account balance.");
         }
@@ -170,8 +146,8 @@ public class App {
 	}
 
 	private void requestBucks() {
-        createSendRequestTransferBanner();
-        Transfer transfer = transferPrompt(1);
+        consoleService.createSendRequestTransferBanner();
+        Transfer transfer = transferMenu.transferPrompt(1);
         transferService.createTransfer(transfer);
         System.out.println();
         System.out.println("Successfully requested TEBucks!");
@@ -278,7 +254,7 @@ public class App {
         User userFrom = userService.getUserById(accountFrom.getUserId());
         User userTo = userService.getUserById(accountTo.getUserId());
 
-        createDetailBanner();
+        consoleService.createDetailBanner();
         System.out.println("Id: " + transfer.getTransferId());
         System.out.println("From: " + userFrom.getUsername());
         System.out.println("To: " + userTo.getUsername());
@@ -287,33 +263,4 @@ public class App {
         System.out.println("Amount: $" + transfer.getAmount());
     }
 
-    private void updateTransfer(Transfer transfer, boolean isApproved) {
-        Account accountFrom = accountService.getAccount(transfer.getAccountFromId());
-        Account accountTo = accountService.getAccount(transfer.getAccountToId()); //Needed in order to increment their balance
-        Account currentAccount = accountService.getAccountFromUserId(currentUser.getUser().getId());
-
-        if (isApproved) {
-            if (currentAccount.getBalance() > transfer.getAmount()) {
-                // update transfer status
-                transfer.setTransferStatusId(2);
-                transferService.updateTransfer(transfer);
-                System.out.println("Transfer approved.");
-
-                //decrement our account
-                accountTo.setBalance(accountTo.getBalance() - transfer.getAmount());
-                accountService.updateAccount(accountTo);
-                System.out.println("Your new account balance is " + accountTo.getBalance());
-
-                //increase their account
-                accountFrom.setBalance(accountFrom.getBalance() + transfer.getAmount());
-                accountService.updateAccount(accountFrom);
-            } else {
-                System.out.println("Insufficient funds.");
-            }
-        } else {
-            transfer.setTransferStatusId(3);
-            transferService.updateTransfer(transfer);
-            System.out.println("Transfer has been rejected.");
-        }
-    }
 }
