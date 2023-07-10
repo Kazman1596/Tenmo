@@ -8,6 +8,10 @@ public class Account {
     private int accountId;
     private int userId;
 
+    public Account() {
+
+    }
+
     public BigDecimal getBalance() {
         return BigDecimal.valueOf(balance);
     }

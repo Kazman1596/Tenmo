@@ -1,7 +1,6 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.exception.DaoException;
-import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
