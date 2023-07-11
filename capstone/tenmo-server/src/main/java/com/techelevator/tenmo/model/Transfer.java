@@ -12,7 +12,7 @@ public class Transfer {
     //To use for mapRowToTransfer in JdbcTransferDao
     public Transfer() {};
 
-    public Transfer(double amount, int accountToId, int accountFromId, int transferTypeId){
+    public Transfer(int amount, int accountToId, int accountFromId, int transferTypeId){
         this.amount = amount;
         this.accountToId = accountToId;
         this.accountFromId = accountFromId;
