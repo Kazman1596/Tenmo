@@ -28,31 +28,6 @@ public class ConsoleService {
         System.out.println("* Welcome to TEnmo! *");
         System.out.println("*********************");
     }
-    public void createTransferBanner() {
-        System.out.println("--------------------------------------------");
-        System.out.println("Past Transfers");
-        System.out.println("ID           From/To           Amount");
-        System.out.println("--------------------------------------------");
-    }
-    public void createPendingTransferBanner() {
-        System.out.println("--------------------------------------------");
-        System.out.println("Pending Transfers");
-        System.out.println("ID           From/To           Amount");
-        System.out.println("--------------------------------------------");
-    }
-
-    public void createSendRequestTransferBanner() {
-        System.out.println("--------------------------------------------");
-        System.out.println("Users");
-        System.out.println("ID           Username");
-        System.out.println("--------------------------------------------");
-    }
-
-    public void createDetailBanner() {
-        System.out.println("--------------------------------------------");
-        System.out.println("Transfer Details");
-        System.out.println("--------------------------------------------");
-    }
 
     public void printLoginMenu() {
         System.out.println();
@@ -106,13 +81,7 @@ public class ConsoleService {
             System.out.print(prompt);
             while (true) {
                 try {
-                    //updated to only accept a positive number
-                    BigDecimal amount = new BigDecimal(scanner.nextLine());
-                    if (amount.compareTo(BigDecimal.ZERO) > 0) {
-                        return amount;
-                    } else {
-                        System.out.println("Amount cannot be a number less than 0");
-                    }
+                    return new BigDecimal(scanner.nextLine());
                 } catch (NumberFormatException e) {
                     System.out.println("Please enter a decimal number.");
                 }

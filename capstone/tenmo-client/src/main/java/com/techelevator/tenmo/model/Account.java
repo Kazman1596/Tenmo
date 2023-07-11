@@ -5,14 +5,14 @@ import java.math.BigDecimal;
 public class Account {
 
     int accountId;
-    BigDecimal balance;
+    Double balance;
     int userId;
 
-    public BigDecimal getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public void setBalance(Double balance) {
         this.balance = balance;
     }
 
