@@ -8,6 +8,9 @@ public class Account {
     private int accountId;
     private int userId;
 
+    public Account(double v, int i, int i1) {
+    }
+
     public Account() {
 
     }
